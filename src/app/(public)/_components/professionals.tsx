@@ -17,9 +17,9 @@ const professionals = [
 
 export function Professionals() {
   return (
-    <section className="bg-gray-200 mt-6">
-      <div className="container py-8">
-        <h2 className="text-3xl font-bold text-center mb-12">
+    <section className="bg-gray-200 mt-6 w-full justify-center ">
+      <div className="container flex w-[100%] justify-centerpy-8 text-center">
+        <h2 className="text-3xl text-center my-10">
           Clínicas disponíveis
         </h2>
       </div>
@@ -39,7 +39,7 @@ export function Professionals() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <CardTitle className="text-xl mt-4">{prof.name}</CardTitle>
-                  <div className="w-3.5 h-3.5 rounded-full bg-green-500"></div>
+                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-500"></div>
                 </div>
                 <p className="text-sm text-gray-700">{prof.address}</p>
               </div>
@@ -48,8 +48,8 @@ export function Professionals() {
               <Link href="/dashboard"
                 className="w-full text-center 
               text-neutral-800
-              bg-green-500 hover:text-white 
-              hover:bg-green-600 ease-in-out duration-300 
+              bg-emerald-500 hover:text-white 
+              hover:bg-emerald-600 ease-in-out duration-300 
               font-bold py-2 rounded">
                 Agendar consulta
                 <ArrowRight className="ml-2 inline text-sm font-medium" />

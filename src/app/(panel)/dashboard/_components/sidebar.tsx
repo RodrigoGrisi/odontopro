@@ -69,7 +69,6 @@ export default function SideBarDashboard({ children }: { children: React.ReactNo
         </nav>
       </aside>
 
-      {/* MAIN CONTENT */}
       <div className="flex-1 p-4 bg-gray-100 pt-16 md:pt-4">
         {children}
       </div>
