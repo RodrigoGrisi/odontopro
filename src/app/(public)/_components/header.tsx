@@ -1,69 +1,124 @@
+"use client";
+import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { LogIn, Menu } from "lucide-react";
 
 export function Header() {
-  const website = "https://www.google.com.br";
 
-  const navLinks = [
-    { label: "Home", href: website },
-    { label: "About", href: "/about" },
-    { label: "Services", href: "/services" },
-    { label: "Contact", href: "/contact" },
-    { label: "Login", href: "/login" },
+  const [isOpen, setIsOpen] = useState(false);
+  const session = null
+
+  const navItens = [
+    { label: "Página Inicial", href: "/" },
+    { label: "Planos", href: "/planos" },
   ];
 
+  const NavLinks = () => {
+    return (
+      <>
+        {navItens.map((link) => (
+          <Button
+            onClick={() => setIsOpen(false)}
+            key={link.href}
+            asChild
+            className="bg-transparent hover:bg-transparent text-black hover:text-white shadow-none text-base"
+          >
+            <Link href={link.href}>
+              {link.label}
+            </Link>
+          </Button>
+        ))}
+
+        {/* MOBILE */}
+        <div className="block md:hidden w-full">
+          {session ? (
+            <Link
+              href="/dashboard"
+              className="flex items-center justify-center gap-2 w-full bg-rose-500 text-white rounded-md px-4 py-2 hover:opacity-90"
+            >
+              Acessar Dashboard
+              <LogIn />
+            </Link>
+          ) : (
+            <Button className="flex items-center justify-center gap-2 w-full bg-rose-500 text-white rounded-md px-4 py-2 hover:opacity-90">
+              Fazer login
+              <LogIn />
+            </Button>
+          )}
+        </div>
+
+        {/* DESKTOP */}
+        <div className="hidden md:flex">
+          {session ? (
+            <Button variant="default" asChild>
+              <Link href="/dashboard" className="flex items-center gap-2">
+                Acessar Dashboard
+                <LogIn />
+              </Link>
+            </Button>
+          ) : (
+            <Button className="flex items-center gap-2">
+              Fazer login
+              <LogIn />
+            </Button>
+          )}
+        </div>
+      </>
+    );
+  };
+
+
   return (
-    <header className="fixed top-0 left-0 w-full bg-rose-500 text-white z-[999] px-4 md:px-64 py-4 shadow-md">
+    <header className="fixed top-0 left-0 right-0 bg-rose-500 text-white z-[999] px-4 md:px-64 py-4">
       <div className="container mx-auto flex justify-between items-center">
-        <a href={website} className="flex items-center gap-1 hover:opacity-90">
-          <span className="text-zinc-900 text-4xl font-bold">Job</span>
+        <a href="/" className="flex items-center gap-1 hover:opacity-90">
+          <span className="text-zinc-900 text-4xl font-bold">Odonto</span>
           <span className="text-white text-4xl drop-shadow">Pro</span>
         </a>
 
-        <nav className="hidden md:flex space-x-6">
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="hover:text-gray-200">
-              {link.label}
-            </a>
-          ))}
+        <nav className="hidden md:flex flex-wrap items-center gap-4 px-4 py-2 rounded">
+          <NavLinks />
         </nav>
 
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                className="bg-white text-rose-500 hover:bg-gray-200"
-                variant="ghost"
-                size="icon"
-              >
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[350px] z-[9999]">
-              <SheetHeader className="mt-4 mx-2">
-                <SheetTitle className="text-rose-500">Menu</SheetTitle>
-              </SheetHeader>
-              <nav className="mt-4 flex flex-col divide-y divide-rose-200/40 mx-6">
-                {navLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    className="py-2 text-rose-500 hover:text-rose-700 transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button
+              className="text-black hover:bg-transparent"
+              variant="ghost"
+              size="icon"
+            >
+              <Menu className="w-6 h-6" />
+            </Button>
+          </SheetTrigger>
+
+          <SheetContent
+            side="right"
+            className="w-[250px] sm:w-[300px] z-[9999] px-4 py-6"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-left text-lg font-semibold text-rose-500">
+                Menu
+              </SheetTitle>
+              <SheetDescription className="text-left text-sm text-zinc-500">
+                Veja nossos links
+              </SheetDescription>
+            </SheetHeader>
+
+            <nav className="flex flex-col items-start gap-3 mt-6 w-full">
+              <NavLinks />
+            </nav>
+          </SheetContent>
+        </Sheet>
+
       </div>
     </header>
   );
