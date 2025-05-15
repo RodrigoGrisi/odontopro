@@ -1,31 +1,8 @@
 export default function Dashboard() {
-  return (
-    <div className="font-black text-3xl text-center mt-10">
-      <h1 className="text-4xl text-blue-500">Dashboard</h1>
-      <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-
-      <div className="font-black text-3xl text-center mt-10 h-[300px]">
-        <h1 className="text-4xl text-blue-500">Dashboard</h1>
-        <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-      </div>
-
-      <div className="font-black text-3xl text-center mt-10 h-[300px]">
-        <h1 className="text-4xl text-blue-500">Dashboard</h1>
-        <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-      </div>      <div className="font-black text-3xl text-center mt-10 h-[300px]">
-        <h1 className="text-4xl text-blue-500">Dashboard</h1>
-        <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-      </div>      <div className="font-black text-3xl text-center mt-10 h-[300px]">
-        <h1 className="text-4xl text-blue-500">Dashboard</h1>
-        <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-      </div>      <div className="font-black text-3xl text-center mt-10 h-[300px]">
-        <h1 className="text-4xl text-blue-500">Dashboard</h1>
-        <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-      </div>      <div className="font-black text-3xl text-center mt-10 h-[300px]">
-        <h1 className="text-4xl text-blue-500">Dashboard</h1>
-        <h1>This is a simple Next.js app with Tailwind CSS.</h1>
-      </div>
-
-    </div>
-  )
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+            <h1 className="text-3xl font-bold">Agendamentos</h1>
+            <p className="mt-4 text-lg">Em breve seus agendamentos aparecerão aqui.</p>
+        </div>
+    );
 }
