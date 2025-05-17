@@ -11,11 +11,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { LogIn, Menu } from "lucide-react";
+import { useSession } from 'next-auth/react';
+import { handleRegister } from '../_actions/login'
 
 export function Header() {
+  const { data: session, status } = useSession();
+
+  console.log('session', session)
+  console.log('status', status)
 
   const [isOpen, setIsOpen] = useState(false);
-  const session = null
 
   const navItens = [
     { label: "Página Inicial", href: "/" },
@@ -23,6 +28,11 @@ export function Header() {
   ];
 
   const NavLinks = () => {
+
+    async function handleLogin() {
+      await handleRegister("github")
+    }
+
     return (
       <>
         {navItens.map((link) => (
@@ -40,37 +50,52 @@ export function Header() {
 
         {/* MOBILE */}
         <div className="block md:hidden w-full">
-          {session ? (
-            <Link
-              href="/dashboard"
-              className="flex items-center justify-center gap-2 w-full bg-green-500 text-white rounded-md px-4 py-2 hover:opacity-90"
-            >
-              Acessar Dashboard
-              <LogIn />
-            </Link>
-          ) : (
-            <Button className="flex items-center justify-center gap-2 w-full bg-green-500 text-white rounded-md px-4 py-2 hover:opacity-90">
-              Fazer login
-              <LogIn />
-            </Button>
-          )}
-        </div>
-
-        {/* DESKTOP */}
-        <div className="hidden md:flex">
-          {session ? (
-            <Button variant="default" asChild>
-              <Link href="/dashboard" className="flex items-center gap-2">
+          {status === 'loading' ?
+            (<></>) :
+            session ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-center gap-2 w-full bg-green-500 text-white rounded-md px-4 py-2 hover:opacity-90"
+              >
                 Acessar Dashboard
                 <LogIn />
               </Link>
-            </Button>
-          ) : (
-            <Button className="flex items-center gap-2">
-              Fazer login
-              <LogIn />
-            </Button>
-          )}
+            ) : (
+              <Button
+                onClick={handleLogin}
+                className="flex items-center justify-center gap-2 w-full bg-green-500 text-white rounded-md px-4 py-2 hover:opacity-90">
+                Fazer login
+                <LogIn />
+              </Button>
+            )}
+        </div>
+
+        {/* DESKTOP */}
+        <div className="hidden md:flex items-center gap-4">
+          <div className="flex flex-col items-center ">
+            {session ?
+              <div className="px-6 py-2 rounded-md text-sm text-center text-black flex flex-col">
+                <span className="text-xs p-0.5">Bem-vindo, <span className="font-semibold">{session?.user?.name}</span></span>
+              </div> : <></>
+            }
+            {session ? (
+              <Button variant="default" asChild>
+                <Link href="/dashboard" className="flex items-center gap-2">
+                  Acessar Dashboard
+                  <LogIn />
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                onClick={handleLogin}
+                className="flex items-center gap-2">
+                Fazer login
+                <LogIn />
+              </Button>
+            )}
+
+          </div>
+
         </div>
       </>
     );
