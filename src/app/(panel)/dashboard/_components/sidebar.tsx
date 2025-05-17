@@ -11,7 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Button } from '@/components/ui/button'
-import { Banknote, CalendarCheck2, Folder, List, Settings } from 'lucide-react'
+import { Banknote, CalendarCheck2, ChevronLeft, ChevronRight, Folder, List, Settings } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import logotipoOdontoPro from '../../../../../public/imgs/logo.png'
@@ -26,7 +26,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
       {/* Sidebar fixa no desktop */}
       <aside
         className={clsx(
-          "flex flex-col border-r bg-background transition-all duration-300 p-4 h-full",
+          "flex flex-col bg-background transition-all duration-400",
           {
             "w-20": isCollapsed,
             "w-64": !isCollapsed,
@@ -34,23 +34,46 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
           }
         )}
       >
-
-        <div>
-          <Image src={logotipoOdontoPro}
-            alt="Logotipo Odonto Pro"
-            width={500}
-            quality={100}
-          />
+        <div className="h-[72px] flex p-2 items-center justify-between">
+          {!isCollapsed && (
+            <Image
+              src={logotipoOdontoPro}
+              alt="Logotipo Odonto Pro"
+              width={180}
+              quality={100}
+              className="transition-opacity duration-400 ease-in-out "
+            />
+          )}
+          {isCollapsed ? (
+            <Button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-2 rounded-lg bg-gray-500 hover:bg-emerald-400
+             text-white transition-colors duration-400"
+            >
+              <span className="w-12 flex items-center justify-center">
+                <ChevronRight className="w-6 h-6" />
+              </span>
+            </Button>
+          ) : (
+            <Button onClick={() => setIsCollapsed(!isCollapsed)}
+              className="p-2 rounded-lg bg-emerald-500 hover:bg-emerald-400
+             text-white transition-colors duration-400"
+            >
+              <span className="w-6 flex items-center justify-center ">
+                <ChevronLeft className="w-6 h-6" />
+              </span>
+            </Button>
+          )}
         </div>
 
 
-        <nav className="flex flex-col gap-4">
+        <nav className="flex flex-col gap-4 ">
           <SidebarLink
             href="/dashboard"
             label="Agendamentos"
             pathname={pathname}
             isCollapsed={isCollapsed}
-            icon={<CalendarCheck2 className="w-6 h-6" />}
+            icon={<CalendarCheck2 className="w-6 h-6 text-center" />}
           />
           <SidebarLink
             href="/dashboard/services"
@@ -93,7 +116,6 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
               quality={100}
             />
           </div>
-
           <Sheet>
             <div className="flex items-center gap-4">
               <SheetTrigger asChild>
@@ -172,14 +194,16 @@ function SidebarLink({ href, icon, isCollapsed, label, pathname }: SidebarLinkPr
     <Link href={href}>
       <div
         className={clsx(
-          "flex items-center gap-2 px-3 py-2 rounded-md transition-colors m-2",
+          "flex items-center px-3 py-2 rounded-md transition-colors mx-2",
           {
+            "justify-center": isCollapsed,
+            "gap-3": !isCollapsed,
             "text-white bg-emerald-500": pathname === href,
             "text-gray-700 hover:bg-gray-100": pathname !== href,
           }
         )}
       >
-        <span className="w-6 h-6">{icon}</span>
+        <span className="w-6 h-6 flex items-center justify-center">{icon}</span>
         {!isCollapsed && <span>{label}</span>}
       </div>
     </Link>
