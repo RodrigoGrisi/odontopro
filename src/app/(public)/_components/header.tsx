@@ -16,10 +16,6 @@ import { handleRegister } from '../_actions/login'
 
 export function Header() {
   const { data: session, status } = useSession();
-
-  console.log('session', session)
-  console.log('status', status)
-
   const [isOpen, setIsOpen] = useState(false);
 
   const navItens = [
@@ -93,9 +89,7 @@ export function Header() {
                 <LogIn />
               </Button>
             )}
-
           </div>
-
         </div>
       </>
     );

@@ -173,7 +173,7 @@ export function SidebarDashboard({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Conteúdo renderizado */}
-        <main className="flex-1 py-4 px-2 md:p-6">
+        <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100" >
           {children}
         </main>
       </div>
