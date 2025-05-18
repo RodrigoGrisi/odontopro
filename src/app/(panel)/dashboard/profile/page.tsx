@@ -1,6 +1,8 @@
 import getSession from "@/lib/getSession";
 import { redirect } from "next/navigation";
 import { getUserData } from "./_data-acesses/get-info-user";
+import ProfileContent from "@/app/(panel)/dashboard/profile/_components/profile";
+
 
 export default async function Profile() {
   const session = await getSession();
@@ -10,9 +12,8 @@ export default async function Profile() {
   if (!user) redirect("/");
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold">Perfil - {session.user.name}</h1>
-      <p className="mt-4 text-lg">Esta é a página de perfil.</p>
+    <div>
+      <ProfileContent />
     </div>
   );
 }
