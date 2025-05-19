@@ -1,5 +1,7 @@
 "use client"
 import { useState } from 'react'
+import { Subscription, User } from "@/generated/prisma";
+import Image from 'next/image'
 import { ProfileFormData, useProfileForm } from './profile-form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -27,24 +29,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
-
 import { cn } from '@/lib/utils'
 import { updateProfile } from '../_actions/update-profile'
 import { toast } from 'sonner'
 import { formatPhone } from '@/utils/formatPhone'
-import { Prisma } from '@prisma/client'
-
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
-
-type UserWithSubscription = Awaited<ReturnType<typeof prisma.user.findFirst>>
 
 interface ProfileContentProps {
-  user: UserWithSubscription;
+  user: User & {
+    subscription: Subscription;
+  };
 }
 
 export function ProfileContent({ user }: ProfileContentProps) {
@@ -55,8 +50,9 @@ export function ProfileContent({ user }: ProfileContentProps) {
     name: user.name,
     address: user.address,
     phone: user.phone,
-    status: user.status,
-    timeZone: user.timeZone
+    status: user.status ?? false,
+    timeZone: user.timeZone,
+    email: user.email ?? "", 
   });
 
 
@@ -122,12 +118,13 @@ export function ProfileContent({ user }: ProfileContentProps) {
             <CardContent className='space-y-6'>
               <div className='flex justify-center'>
                 <div className='bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden'>
-                  {/* <Image
-                    src={user.image ? user.image : imgTest}
+                  <Image
+                    src={user.image ? user.image : ""}
                     alt="Foto da clinica"
                     fill
+                    priority
                     className='object-cover'
-                  /> */}
+                  />
                 </div>
               </div>
 

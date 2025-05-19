@@ -6,8 +6,9 @@ interface UseProfileFormProps {
   name: string | null;
   address: string | null;
   phone: string | null;
-  status: boolean;
+  status: true | false | null;
   timeZone: string | null;
+  email: string | null;
 }
 
 
@@ -17,11 +18,12 @@ const profileSchema = z.object({
   phone: z.string().optional(),
   status: z.string(),
   timeZone: z.string().min(1, { message: "O time zone é obrigatório" }),
+  email: z.string().optional()
 })
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
 
-export function useProfileForm({ name, address, phone, status, timeZone }: UseProfileFormProps) {
+export function useProfileForm({ name, address, phone, status, timeZone, email }: UseProfileFormProps) {
   return useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -29,7 +31,8 @@ export function useProfileForm({ name, address, phone, status, timeZone }: UsePr
       address: address || "",
       phone: phone || "",
       status: status ? "active" : "inactive",
-      timeZone: timeZone || ""
+      timeZone: timeZone || "",
+      email: email || "" // aqui usa o que veio
     }
   })
 }
