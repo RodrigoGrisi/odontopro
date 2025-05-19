@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
+
 import {
   Card,
   CardContent,
@@ -17,15 +18,12 @@ export default async function Dashboard() {
     redirect("/");
   }
 
-  console.log(session.user.id);
-
-
   const infosUser = session && {
-    name: session?.user?.name,
+    name: session.user.name,
     email: session?.user?.email,
     image: session?.user?.image,
-    created: session?.user?.createdAt,
-    updated: session?.user?.updatedAt,
+    createdAt: session?.user?.createdAt,
+    updatedAt: session?.user?.updatedAt,
     stripe: session.user.stripe_customer_id,
   };
 
@@ -35,7 +33,6 @@ export default async function Dashboard() {
         <Card className="w-full ">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-              {/* Imagem + info */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start w-full">
                 <img
                   src={infosUser.image ?? undefined}
@@ -45,7 +42,7 @@ export default async function Dashboard() {
                   className="w-24 h-24 rounded-full border border-gray-300"
                 />
                 <div className="mt-4 sm:mt-0 sm:ml-4 text-center sm:text-left">
-                  <CardTitle>Seja bem-vindo, {infosUser?.name}!</CardTitle>
+                  <CardTitle>Seja bem-vindo, {infosUser.name}!</CardTitle>
                   <CardDescription className="mb-2">
                     Essas são suas informações:
                   </CardDescription>
@@ -53,12 +50,12 @@ export default async function Dashboard() {
                     <strong>Email:</strong> {infosUser.email}
                   </p>
                   <p>
-                    <strong>Conta criada em:</strong>{" "}
-                    {new Date(infosUser.created).toLocaleDateString()}
+                    <strong>Conta criada em:</strong>{" "} 
+                    {new Date(infosUser.createdAt).toLocaleDateString()}
                   </p>
                   <p>
-                    <strong>Última atualização:</strong>{" "}
-                    {new Date(infosUser.updated).toLocaleDateString()}
+                    <strong>Última atualização:</strong>
+                    {new Date(infosUser.updatedAt).toLocaleDateString()}
                   </p>
                   <p>
                     <strong>Stripe:</strong>{" "}

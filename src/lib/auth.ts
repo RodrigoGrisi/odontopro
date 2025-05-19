@@ -1,9 +1,9 @@
-// src/lib/auth.ts
 import { getServerSession } from "next-auth";
 import { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./prisma";
+
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -16,14 +16,16 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, user }) {
       if (session?.user) {
-        session.user.id = user.id; // aqui garante que session.user.id existe
+        session.user.id = user.id; 
+        session.user.email = user.email;
+        session.user.createdAt = user.createdAt;
+        session.user.updatedAt = user.updatedAt;
       }
       return session;
     },
   },
 };
 
-// 🧠 Essa função você importa como { auth }
 export async function auth() {
   return await getServerSession(authOptions);
 }
