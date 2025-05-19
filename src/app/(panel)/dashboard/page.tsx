@@ -1,4 +1,5 @@
-import getSession from "@/lib/getSession";
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/lib/auth"
 import {
   Card,
   CardContent,
@@ -10,11 +11,14 @@ import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
-  const session = await getSession();
+  const session = await getServerSession(authOptions)
 
   if (!session) {
     redirect("/");
   }
+
+  console.log(session.user.id);
+
 
   const infosUser = session && {
     name: session?.user?.name,
