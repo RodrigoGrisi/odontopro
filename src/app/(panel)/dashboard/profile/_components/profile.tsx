@@ -38,7 +38,8 @@ import { formatPhone } from '@/utils/formatPhone'
 
 interface ProfileContentProps {
   user: User & {
-    subscription: Subscription;
+    subscription: Subscription | null;
+    times: string[];
   };
 }
 
@@ -106,9 +107,8 @@ export function ProfileContent({ user }: ProfileContentProps) {
     toast.success(response.data)
   }
 
-
   return (
-    <div className='mx-auto'>
+    <div className='flex flex-col h-screen w-full p-4'>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
