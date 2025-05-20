@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DialogDescription } from "@radix-ui/react-dialog"
 import { useDialogServiceForm, DialogServiceFormData } from "./dialog-service-form"
@@ -6,14 +7,49 @@ import { Form, FormControl, FormLabel, FormField, FormItem, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { convertRealtoCents } from "@/utils/convertCurrency";
+import { createNewService } from "../_actions/create_service";
+import { toast } from "sonner";
 
-export function DialogService() {
+
+interface DialogServiceProps {
+  handleClose: () => void;
+}
+
+export function DialogService({ handleClose }: DialogServiceProps) {
   const form = useDialogServiceForm();
+  const [isLoading, setIsLoading] = useState(false);
 
   async function onSubmit(values: DialogServiceFormData) {
+    setIsLoading(true);
+    const priceIncents = convertRealtoCents(values.price);
+    const hours = parseInt(values.hours) || 0;
+    const Minutes = parseInt(values.minutes) || 0;
 
-    const converter = convertRealtoCents(values.price);
+    const duration = (hours * 60) + Minutes;
 
+    const response = await createNewService({
+      name: values.name,
+      price: priceIncents,
+      duration: duration,
+    })
+
+    toast.success("Serviço criado com sucesso", {
+      duration: 2000,
+    });
+
+    handleCloseModal();
+    setIsLoading(false);
+
+    if (response.error) {
+      toast.error(response.error);
+      setIsLoading(false);
+      return;
+    }
+
+  }
+
+  function handleCloseModal() {
+    handleClose();
     form.reset();
   }
 
@@ -124,8 +160,12 @@ export function DialogService() {
               )}
             />
           </div>
-          <Button type="submit" className="w-full font-semibold text-white cursor-pointer">
-            Adicionar serviço
+          <Button
+            type="submit"
+            className="w-full font-semibold text-white cursor-pointer"
+            disabled={isLoading}
+          >
+            {isLoading ? "Cadastrando serviço..." : "Adicionar serviço"}
           </Button>
         </form>
       </Form>
