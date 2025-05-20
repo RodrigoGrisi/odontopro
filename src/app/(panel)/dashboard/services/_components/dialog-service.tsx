@@ -5,26 +5,31 @@ import { useDialogServiceForm, DialogServiceFormData } from "./dialog-service-fo
 import { Form, FormControl, FormLabel, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { convertRealtoCents } from "@/utils/convertCurrency";
 
 export function DialogService() {
-
   const form = useDialogServiceForm();
 
-
   async function onSubmit(values: DialogServiceFormData) {
-    console.log(values);
+
+    const converter = convertRealtoCents(values.price);
+
     form.reset();
   }
 
+  /**
+   * Altera o valor do input para o padrão brasileiro usando regex
+   * @param event 
+   */
   function changeCurrencyTemplate(event: React.ChangeEvent<HTMLInputElement>) {
     let { value } = event.target;
 
     value = value.replace(/\D/g, '');
 
-    if(value){
-      value = (parseInt(value, 10) / 100 ).toFixed(2);
+    if (value) {
+      value = (parseInt(value, 10) / 100).toFixed(2);
       value = value.replace('.', ',');
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); 
+      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       event.target.value = value;
     }
 
