@@ -2,6 +2,7 @@
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 import prisma from "@/lib/prisma"
+import { revalidatePath } from 'next/cache'
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Campo obrigatório" }),
@@ -24,11 +25,9 @@ export async function createNewService(formData: FormSchema) {
     return {
       message: schema.error.issues[0].message,
     };
-
   }
 
   try {
-
     const newService = await prisma.services.create({
       data: {
         name: formData.name,
@@ -37,6 +36,9 @@ export async function createNewService(formData: FormSchema) {
         userId: session.user.id,
       },
     });
+
+    // Revalidar o cache da página de serviços
+    revalidatePath("/dashboard/services");
 
     return {
       message: "Serviço criado com sucesso",
@@ -52,6 +54,4 @@ export async function createNewService(formData: FormSchema) {
     };
 
   }
-
-
 }
