@@ -35,6 +35,8 @@ import { cn } from '@/lib/utils'
 import { updateProfile } from '../_actions/update-profile'
 import { toast } from 'sonner'
 import { formatPhone } from '@/utils/formatPhone'
+import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation'
 
 interface ProfileContentProps {
   user: User & {
@@ -47,13 +49,24 @@ export function ProfileContent({ user }: ProfileContentProps) {
   const [selectedHours, setSelectedHours] = useState<string[]>(user.times ?? [])
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
+  const router = useRouter();
+  const { update } = useSession();
+
+  async function handleSignOut() {
+
+    await signOut();
+    await update();
+    router.replace("/");
+
+  };
+
   const form = useProfileForm({
     name: user.name,
     address: user.address,
     phone: user.phone,
     status: user.status ?? false,
     timeZone: user.timeZone,
-    email: user.email ?? "", 
+    email: user.email ?? "",
   });
 
 
@@ -112,11 +125,22 @@ export function ProfileContent({ user }: ProfileContentProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
-            <CardHeader>
+            <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle>Meu Perfil</CardTitle>
+              <section className='flex flex-col items-start justify-center '>
+                <Button
+                  variant="destructive"
+                  className=' bg-red-500 hover:bg-red-400'
+                  onClick={handleSignOut}
+                >
+                  Sair da conta
+                </Button>
+              </section>
             </CardHeader>
             <CardContent className='space-y-6'>
               <div className='flex justify-center'>
+
+
                 <div className='bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden'>
                   <Image
                     src={user.image ? user.image : ""}
@@ -309,11 +333,14 @@ export function ProfileContent({ user }: ProfileContentProps) {
                   Salvar alterações
                 </Button>
 
+
               </div>
             </CardContent>
           </Card>
         </form>
       </Form>
+
+
     </div>
   )
 }
