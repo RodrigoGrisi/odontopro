@@ -9,14 +9,22 @@ import { Button } from "@/components/ui/button";
 import { convertRealtoCents } from "@/utils/convertCurrency";
 import { createNewService } from "../_actions/create_service";
 import { toast } from "sonner";
+import { set } from "zod";
 
 
 interface DialogServiceProps {
   handleClose: () => void;
+  serviceId?: string;
+  initialValues?: {
+    name: string;
+    price: string;
+    hours: string;
+    minutes: string;
+  }
 }
 
-export function DialogService({ handleClose }: DialogServiceProps) {
-  const form = useDialogServiceForm();
+export function DialogService({ handleClose, initialValues, serviceId }: DialogServiceProps) {
+  const form = useDialogServiceForm({ initialValues: initialValues });
   const [isLoading, setIsLoading] = useState(false);
 
   async function onSubmit(values: DialogServiceFormData) {
@@ -26,6 +34,23 @@ export function DialogService({ handleClose }: DialogServiceProps) {
     const Minutes = parseInt(values.minutes) || 0;
 
     const duration = (hours * 60) + Minutes;
+
+    if(serviceId) {
+      await handleEditServiceById({
+        serviceId: serviceId,
+        name: values.name,
+        priceInCents: priceIncents,
+        duartion: duration,
+      })
+      setIsLoading(false);
+      toast.success("Serviço atualizado com sucesso", {
+        duration: 2000,
+      });
+      handleCloseModal();
+      return;
+    }
+
+
 
     const response = await createNewService({
       name: values.name,
@@ -71,6 +96,19 @@ export function DialogService({ handleClose }: DialogServiceProps) {
 
     event.target.value = value
     form.setValue('price', value);
+  }
+
+  async function handleEditServiceById({ 
+    serviceId, 
+    name, 
+    priceInCents, 
+    duartion }: {
+    serviceId: string;
+    name: string;
+    priceInCents: number;
+    duartion: number;
+  }) {
+    setIsLoading(true);
   }
 
   return (
@@ -165,7 +203,7 @@ export function DialogService({ handleClose }: DialogServiceProps) {
             className="w-full font-semibold text-white cursor-pointer"
             disabled={isLoading}
           >
-            {isLoading ? "Cadastrando serviço..." : "Adicionar serviço"}
+            {isLoading ? "Cadastrando serviço..." : `${serviceId ? "Atualizar" : "Cadastrar"}`}
           </Button>
         </form>
       </Form>
