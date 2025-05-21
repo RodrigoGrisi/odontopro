@@ -10,6 +10,7 @@ import { convertRealtoCents } from "@/utils/convertCurrency";
 import { createNewService } from "../_actions/create_service";
 import { toast } from "sonner";
 import { set } from "zod";
+import { updateService } from "../_actions/update-service";
 
 
 interface DialogServiceProps {
@@ -102,13 +103,33 @@ export function DialogService({ handleClose, initialValues, serviceId }: DialogS
     serviceId, 
     name, 
     priceInCents, 
-    duartion }: {
+    duartion } : {
     serviceId: string;
     name: string;
     priceInCents: number;
     duartion: number;
   }) {
+    
     setIsLoading(true);
+    const response = await updateService({
+      serviceId: serviceId,
+      name: name,
+      price: priceInCents,
+      duration: duartion,
+    })
+
+    setIsLoading(false);
+
+    if (response?.error) {
+      toast.error(response.error);
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success("Serviço atualizado com sucesso", {
+      duration: 2000,
+    }); 
+
   }
 
   return (
