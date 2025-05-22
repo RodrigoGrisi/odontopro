@@ -122,20 +122,20 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
   return (
     <div className='flex flex-col h-screen w-full p-4'>
+      <section className='flex flex-row items-center justify-end w-full space-y-4 my-2'>
+        <Button
+          variant="destructive"
+          className=' bg-red-500 hover:bg-red-400'
+          onClick={handleSignOut}
+        >
+          Sair da conta
+        </Button>
+      </section>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader className='flex flex-row items-center justify-between'>
               <CardTitle>Meu Perfil</CardTitle>
-              <section className='flex flex-col items-start justify-center '>
-                <Button
-                  variant="destructive"
-                  className=' bg-red-500 hover:bg-red-400'
-                  onClick={handleSignOut}
-                >
-                  Sair da conta
-                </Button>
-              </section>
             </CardHeader>
             <CardContent className='space-y-6'>
               <div className='flex justify-center'>
