@@ -84,6 +84,48 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <FormItem>
+                    <FormLabel htmlFor="email" className="font-semibold">E-mail:</FormLabel>
+                    <Input
+                      className="my-1"
+                      id="email"
+                      placeholder="Digite o seu email"
+                      {...field}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <FormItem>
+                    <FormLabel htmlFor="phone" className="font-semibold">Telefone:</FormLabel>
+                    <Input
+                      className="my-1"
+                      id="phone"
+                      placeholder="Digite o seu telefone"
+                      {...field}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </form>
       </Form>
     </div>
