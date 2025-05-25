@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 import Image from "next/image"
 import imageDoctor from "../../../../../../public/imgs/26375249medico.jpg"
 import { MapPin } from "lucide-react"
@@ -10,6 +11,8 @@ import { formatPhone } from '@/utils/formatPhone';
 import { DateTimePicker } from "./data-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { set } from "date-fns"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -26,10 +29,72 @@ interface ScheduleContentProps {
   clinic: UserWithSubscriptionAndServices
 }
 
+interface TimeSlot {
+  time: string,
+  avaliable: boolean
+}
+
+
 export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
   const form = useAppointmentForm();
   const { watch } = form
+  const [selectedTime, setSelectedTime] = useState("");
+  const [avaliableTimeSlots, setAvaliableTimeSlots] = useState<TimeSlot[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  // HORARIOS BLOQUEADOS
+  const [blockedTimes, setBlockedTimes] = useState<string[]>([]);
+
+
+  // Função para buscar os horários disponíveis
+  const fetchBlockedTimes = async (date: Date) => {
+    setLoadingSlots(true);
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schedule/get-appointments`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: clinic.id,
+        date: date.toISOString(),
+      }),
+    });
+    const data = await response.json();
+    console.log("Horários bloqueados:", data);
+    if (data.error) {
+      toast.error("Erro ao buscar horários bloqueados");
+      setLoadingSlots(false);
+      return;
+    }
+    const blockedTimes = data.map((appointment: { date: string }) => {
+      const appointmentDate = new Date(appointment.date);
+      return `${appointmentDate.getHours()}:${appointmentDate.getMinutes()}`;
+    }
+    );
+  }
+
+  async function handleRegisterAppointment(formData: AppointmentFormData) {
+    const { name, email, phone, date, serviceId } = formData
+    const formattedDate = new Date(date);
+    const formattedPhone = phone.replace(/\D/g, "");
+    const appointmentData = {
+      name,
+      email,
+      phone: formattedPhone,
+      date: formattedDate,
+      serviceId,
+      clinicId: clinic.id
+    }
+
+    console.log("Dados do agendamento:", appointmentData);
+    toast.success("Agendamento realizado com sucesso!")
+
+    form.reset();
+
+
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -62,7 +127,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
       <section>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data: AppointmentFormData) => { console.log(data) })}
+            onSubmit={form.handleSubmit(handleRegisterAppointment)}
             className="container mx-auto px-4 mt-8 max-w-2xl"
           >
             <FormField
