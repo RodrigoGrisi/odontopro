@@ -64,7 +64,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
     name: user.name,
     address: user.address,
     phone: user.phone,
-    status: user.status ?? false,
+    status: user.status === true,
     timeZone: user.timeZone,
     email: user.email ?? "",
   });
@@ -106,7 +106,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
     const response = await updateProfile({
       name: values.name,
       address: values.address,
-      status: values.status === 'active' ? true : false,
+      status: values.status === true ? true : false,
       phone: values.phone,
       timeZone: values.timeZone,
       times: selectedHours || []
@@ -189,7 +189,6 @@ export function ProfileContent({ user }: ProfileContentProps) {
                   )}
                 />
 
-
                 <FormField
                   control={form.control}
                   name="phone"
@@ -219,24 +218,23 @@ export function ProfileContent({ user }: ProfileContentProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='font-semibold'>
-                        Status da clinica
+                        Status da clínica
                       </FormLabel>
                       <FormControl>
-
                         <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value ? "active" : "inactive"}
+                          onValueChange={(value) => field.onChange(value === "active")}
+                          value={field.value ? "active" : "inactive"}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione o status da clincia" />
+                            <SelectValue placeholder="Selecione o status da clínica" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="active">ATIVO (clinica aberta)</SelectItem>
-                            <SelectItem value="inactive">INATIVO (clinica fechada)</SelectItem>
+                            <SelectItem value="active">ATIVO (clínica aberta)</SelectItem>
+                            <SelectItem value="inactive">INATIVO (clínica fechada)</SelectItem>
                           </SelectContent>
                         </Select>
-
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

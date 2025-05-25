@@ -4,13 +4,12 @@ import imageDoctor from "../../../../../../public/imgs/26375249medico.jpg"
 import { MapPin } from "lucide-react"
 import { Prisma } from "@/generated/prisma"
 import { useAppointmentForm, AppointmentFormData } from "./schedule-form";
-import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { formatPhone } from '@/utils/formatPhone';
 import { DateTimePicker } from "./data-picker"
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -30,6 +29,7 @@ interface ScheduleContentProps {
 export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
   const form = useAppointmentForm();
+  const { watch } = form
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -70,17 +70,14 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel htmlFor="name" className="font-semibold">Nome completo:</FormLabel>
                   <FormControl>
-                    <FormItem>
-                      <FormLabel htmlFor="name" className="font-semibold">Nome completo:</FormLabel>
-                      <Input
-                        className="my-1"
-                        id="name"
-                        placeholder="Digite o nome completo do paciente"
-                        {...field}
-                      />
-                      <FormMessage />
-                    </FormItem>
+                    <Input
+                      className="my-1"
+                      id="name"
+                      placeholder="Digite o nome completo do paciente"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,17 +88,14 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel htmlFor="email" className="font-semibold">E-mail:</FormLabel>
                   <FormControl>
-                    <FormItem>
-                      <FormLabel htmlFor="email" className="font-semibold">E-mail:</FormLabel>
-                      <Input
-                        className="my-1"
-                        id="email"
-                        placeholder="Digite o seu email"
-                        {...field}
-                      />
-                      <FormMessage />
-                    </FormItem>
+                    <Input
+                      className="my-1"
+                      id="email"
+                      placeholder="Digite o seu email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,23 +106,19 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
               name="phone"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel htmlFor="phone" className="font-semibold">Telefone:</FormLabel>
                   <FormControl>
-                    <FormItem>
-                      <FormLabel htmlFor="phone" className="font-semibold">Telefone:</FormLabel>
-                      <Input
-                        {...field}
-                        onChange={(e) => {
-                          const formattedValue = formatPhone(e.target.value);
-                          field.onChange(formattedValue);
-                        }}
-                        className="my-1"
-                        id="phone"
-                        placeholder="Digite o seu telefone"
-                      />
-                      <FormMessage />
-                    </FormItem>
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        const formattedValue = formatPhone(e.target.value);
+                        field.onChange(formattedValue);
+                      }}
+                      className="my-1"
+                      id="phone"
+                      placeholder="Digite o seu telefone"
+                    />
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -136,25 +126,74 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
               control={form.control}
               name="date"
               render={({ field }) => (
-                <FormItem className="flex flex-col"> 
+                <FormItem className="flex flex-col">
+                  <FormLabel htmlFor="date" className="font-semibold mr-4">Data de agendamento:</FormLabel>
                   <FormControl>
-                    <FormItem>
-                      <FormLabel htmlFor="date" className="font-semibold mr-4">Data de agendamento:</FormLabel>
-                      <DateTimePicker
-                        initialDate={new Date()}
-                        minDate={new Date()} className="my-1" 
-                        onChange={(date) => {
-                          field.onChange(date);
-                        }
-                        }
-                      />
-                      <FormMessage />
-                    </FormItem>
+                    <DateTimePicker
+                      initialDate={new Date()}
+                      minDate={new Date()} className="my-1"
+                      onChange={(date) => {
+                        field.onChange(date);
+                      }
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="serviceId"
+              render={({ field }) => (
+                <FormItem >
+                  <FormLabel htmlFor="serviceId" className="font-semibold mr-4">
+                    Selecione o serviço:
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione um serviço" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clinic.services.map((service) => (
+                          <SelectItem key={service.id} value={service.id}>
+                            {service.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {
+              clinic.status ? (
+                <Button type="submit"
+                  disabled={
+                    !watch("name") ||
+                    !watch("email") ||
+                    !watch("phone") ||
+                    !watch("date") ||
+                    !watch("serviceId")
+                  }
+                  className="w-full mt-4 bg-emerald-500 hover:bg-emerald-400">Realizar agendamento</Button>
+              ) : (
+                <div className="flex items-center justify-center p-4 bg-red-400  rounded-lg mt-4 ">
+                  <p className="text-white font-semibold text-lg text-center">
+                    A Clínica está fechada neste momento
+                  </p>
+                </div>
+              )
+            }
+
+
           </form>
         </Form>
       </section>

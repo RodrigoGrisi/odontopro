@@ -17,7 +17,7 @@ const profileSchema = z.object({
   name: z.string().min(1, { message: "O nome é obrigatório" }),
   address: z.string().optional(),
   phone: z.string().optional(),
-  status: z.string(),
+  status: z.boolean(),
   timeZone: z.string().min(1, { message: "O time zone é obrigatório" }),
   email: z.string().optional()
 })
@@ -31,7 +31,7 @@ export function useProfileForm({ name, address, phone, status, timeZone, email }
       name: name || "",
       address: address || "",
       phone: phone || "",
-      status: status ? "active" : "inactive",
+      status: status ? true : false,
       timeZone: timeZone || "",
       email: email || "" // aqui usa o que veio
     }
