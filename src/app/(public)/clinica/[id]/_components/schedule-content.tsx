@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
 import imageDoctor from "../../../../../../public/imgs/26375249medico.jpg"
 import { MapPin } from "lucide-react"
@@ -42,38 +42,38 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
   const [selectedTime, setSelectedTime] = useState("");
   const [avaliableTimeSlots, setAvaliableTimeSlots] = useState<TimeSlot[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const selectedDate = watch("date");
+  const selectedServideId = watch("serviceId");
 
   // HORARIOS BLOQUEADOS
   const [blockedTimes, setBlockedTimes] = useState<string[]>([]);
 
-
-  // Função para buscar os horários disponíveis
-  const fetchBlockedTimes = async (date: Date) => {
+  const fetchBlockedTimes = useCallback(async (date: Date): Promise<string[]> => {
     setLoadingSlots(true);
+    try {
+      const dateString = date.toISOString().split("T")[0];
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${dateString}`);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schedule/get-appointments`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: clinic.id,
-        date: date.toISOString(),
-      }),
-    });
-    const data = await response.json();
-    console.log("Horários bloqueados:", data);
-    if (data.error) {
-      toast.error("Erro ao buscar horários bloqueados");
+      return [];
+
+    } catch (error) {
+      console.error("Error fetching blocked times:", error);
       setLoadingSlots(false);
-      return;
+      return [];
     }
-    const blockedTimes = data.map((appointment: { date: string }) => {
-      const appointmentDate = new Date(appointment.date);
-      return `${appointmentDate.getHours()}:${appointmentDate.getMinutes()}`;
+  }, [clinic.id]);
+
+  useEffect(() => {
+
+    if (selectedDate) {
+      fetchBlockedTimes(selectedDate).then((blocked) => {
+        console.log("Horários reservados:", blocked);
+      })
     }
-    );
-  }
+
+
+  }, [fetchBlockedTimes, clinic.times, selectedTime, selectedDate, selectedServideId]);
+
 
   async function handleRegisterAppointment(formData: AppointmentFormData) {
     const { name, email, phone, date, serviceId } = formData
