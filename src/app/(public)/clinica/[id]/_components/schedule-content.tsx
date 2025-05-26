@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { set } from "date-fns"
+import { Label } from "@radix-ui/react-label"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -52,12 +53,15 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
     setLoadingSlots(true);
     try {
       const dateString = date.toISOString().split("T")[0];
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${dateString}`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${dateString}`);
 
-      return [];
+      const json = await response.json();
 
-    } catch (error) {
-      console.error("Error fetching blocked times:", error);
+      setLoadingSlots(false);
+      return json; // retornar os horários bloqueados do dia selecionado.
+
+    } catch (err) {
+      console.error(err);
       setLoadingSlots(false);
       return [];
     }
@@ -67,10 +71,16 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
     if (selectedDate) {
       fetchBlockedTimes(selectedDate).then((blocked) => {
-        console.log("Horários reservados:", blocked);
+        setBlockedTimes(blocked);
+        const times = clinic.times || [];
+        const finalSlots = times.map((time) => ({
+          time,
+          avaliable: !blocked.includes(time) // Verificar se o horário está bloqueado
+        }))
+
+        setAvaliableTimeSlots(finalSlots);
       })
     }
-
 
   }, [fetchBlockedTimes, clinic.times, selectedTime, selectedDate, selectedServideId]);
 
@@ -90,10 +100,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
     console.log("Dados do agendamento:", appointmentData);
     toast.success("Agendamento realizado com sucesso!")
-
     form.reset();
-
-
   }
 
   return (
@@ -237,7 +244,11 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                 </FormItem>
               )}
             />
-
+              {selectedServideId && (
+                <div className="w-full mt-4">
+                  <Label>Horarios disponíveis:</Label>
+                </div>
+              )}
             {
               clinic.status ? (
                 <Button type="submit"
