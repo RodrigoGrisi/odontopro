@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { set } from "date-fns"
 import { Label } from "@radix-ui/react-label"
+import { ScheduleTimeList } from "./schedule-time-list"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -30,7 +31,7 @@ interface ScheduleContentProps {
   clinic: UserWithSubscriptionAndServices
 }
 
-interface TimeSlot {
+export interface TimeSlot {
   time: string,
   avaliable: boolean
 }
@@ -106,7 +107,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="h-32 bg-emerald-500" />
-      <section className="contianer mx-auto px-4 -mt-16">
+      <section className="contianer mx-auto px-4 -mt-16 m-6">
         <div className="max-w-2xl mx-auto">
           <article className="flex flex-col items-center">
             <div className="relative w-48 h-48 rounded-full overflow-hidden border-4 border-white mb-8">
@@ -244,11 +245,31 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                 </FormItem>
               )}
             />
-              {selectedServideId && (
-                <div className="w-full mt-4">
-                  <Label>Horarios disponíveis:</Label>
+            {selectedServideId && (
+              <div className="w-full mt-4">
+                <Label >Horarios disponíveis:</Label>
+                <div className="bg-gray-100 p-4 rounded-lg mt-2">
+                  {loadingSlots ? (
+                    <p className="text-gray-500 text-center">Carregando horários...</p>
+                  ) : avaliableTimeSlots.length === 0 ? (
+                    <p className="text-gray-500 text-center">Nenhum horário disponível para este dia.</p>
+                  ) : (
+                    <ScheduleTimeList
+                      onSelectTime={(time) => setSelectedTime(time)}
+                      clinicTimes={clinic.times || []}
+                      blockedTimes={blockedTimes}
+                      avaliableTimeSlots={avaliableTimeSlots}
+                      selectedDate={selectedDate}
+                      selectedTime={selectedTime}
+                      requiredSlot={
+                        clinic.services.find(service => service.id === selectedServideId) ?
+                          Math.ceil(clinic.services.find(service => service.id === selectedServideId)!.duration / 30) : 1
+                      }
+                    />
+                  )}
                 </div>
-              )}
+              </div>
+            )}
             {
               clinic.status ? (
                 <Button type="submit"
@@ -259,7 +280,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                     !watch("date") ||
                     !watch("serviceId")
                   }
-                  className="w-full mt-4 bg-emerald-500 hover:bg-emerald-400">Realizar agendamento</Button>
+                  className="w-full mt-4 mb-10 bg-emerald-500 hover:bg-emerald-400">Realizar agendamento</Button>
               ) : (
                 <div className="flex items-center justify-center p-4 bg-red-400  rounded-lg mt-4 ">
                   <p className="text-white font-semibold text-lg text-center">
