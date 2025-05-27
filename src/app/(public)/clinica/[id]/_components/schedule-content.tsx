@@ -15,6 +15,8 @@ import { toast } from "sonner"
 import { set } from "date-fns"
 import { Label } from "@radix-ui/react-label"
 import { ScheduleTimeList } from "./schedule-time-list"
+import { createNewAppointment } from "../_actions/create-appointment"
+import { create } from "domain"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -35,7 +37,6 @@ export interface TimeSlot {
   time: string,
   avaliable: boolean
 }
-
 
 export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
@@ -80,6 +81,14 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
         }))
 
         setAvaliableTimeSlots(finalSlots);
+
+        const stillavaliable = finalSlots.find((slot) => slot.time === selectedTime && slot.avaliable)
+
+        if (!stillavaliable) {
+          setSelectedTime("");
+        }
+
+
       })
     }
 
@@ -87,21 +96,31 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
 
   async function handleRegisterAppointment(formData: AppointmentFormData) {
-    const { name, email, phone, date, serviceId } = formData
-    const formattedDate = new Date(date);
-    const formattedPhone = phone.replace(/\D/g, "");
-    const appointmentData = {
-      name,
-      email,
-      phone: formattedPhone,
-      date: formattedDate,
-      serviceId,
-      clinicId: clinic.id
+
+
+    if (!selectedTime) {
+      toast.error("Selecione um horário");
+      return;
     }
 
-    console.log("Dados do agendamento:", appointmentData);
+    const response = await createNewAppointment({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      time: selectedTime,
+      date: formData.date,
+      serviceId: formData.serviceId,
+      clinicId: clinic.id
+    })
+
+    if (response.error) {
+      toast.error(response.error);
+      return;
+    }
+
     toast.success("Agendamento realizado com sucesso!")
     form.reset();
+    setSelectedTime("");
   }
 
   return (
@@ -235,7 +254,8 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                       <SelectContent>
                         {clinic.services.map((service) => (
                           <SelectItem key={service.id} value={service.id}>
-                            {service.name}
+                            {service.name} - {Math.floor(service.duration / 60)}h {service.duration % 60}min
+
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -289,7 +309,6 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                 </div>
               )
             }
-
 
           </form>
         </Form>

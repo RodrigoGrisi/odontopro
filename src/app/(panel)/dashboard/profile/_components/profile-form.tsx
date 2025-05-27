@@ -12,7 +12,6 @@ interface UseProfileFormProps {
   email: string | null;
 }
 
-
 const profileSchema = z.object({
   name: z.string().min(1, { message: "O nome é obrigatório" }),
   address: z.string().optional(),
@@ -33,7 +32,7 @@ export function useProfileForm({ name, address, phone, status, timeZone, email }
       phone: phone || "",
       status: status ? true : false,
       timeZone: timeZone || "",
-      email: email || "" // aqui usa o que veio
+      email: email || ""
     }
   })
 }

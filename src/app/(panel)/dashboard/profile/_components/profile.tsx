@@ -71,19 +71,19 @@ export function ProfileContent({ user }: ProfileContentProps) {
 
 
   function generateTimeSlots(): string[] {
-    const hours: string[] = [];
+  const hours: string[] = [];
 
-    for (let i = 8; i <= 24; i++) {
-      for (let j = 0; j < 2; j++) {
-        const hour = i.toString().padStart(2, "0")
-        const minute = (j * 30).toString().padStart(2, "0")
-        hours.push(`${hour}:${minute}`)
-      }
+  for (let i = 8; i <= 23; i++) {
+    for (let j = 0; j < 2; j++) {
+      const hour = i.toString().padStart(2, "0");
+      const minute = (j * 30).toString().padStart(2, "0");
+      hours.push(`${hour}:${minute}`);
     }
-
-    return hours;
-
   }
+
+  return hours;
+}
+
 
   const hours = generateTimeSlots();
 
@@ -270,7 +270,8 @@ export function ProfileContent({ user }: ProfileContentProps) {
                             <Button
                               key={hour}
                               variant="outline"
-                              className={cn('h-10', selectedHours.includes(hour) && 'border-2 border-emerald-500 text-primary')}
+                              className={cn('h-10', selectedHours.includes(hour) 
+                                && 'border-2 border-emerald-500 text-primary')}
                               onClick={() => toggleHour(hour)}
                             >
                               {hour}
