@@ -1,79 +1,92 @@
+// Backend meusite.com/api/schedule/get-appointments
 
-//BACKEND - localhost:3000/api/schedule/get-appointments ?userId=...&date=...
-"use server"
-import prisma from "@/lib/prisma";
-import { type NextRequest, NextResponse } from "next/server";
+import prisma from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-
-  //BUSCAR SE TEM AGENDAMENTOS
   const { searchParams } = request.nextUrl;
-  const userId = searchParams.get("userId");
-  const dateParm = searchParams.get("date");
 
-  if (!userId || userId === null || !dateParm || dateParm === null) {
+  const userId = searchParams.get('userId')
+  const dateParam = searchParams.get('date')
+
+
+  console.log(dateParam)
+
+  if (!userId || userId === "null" || !dateParam || dateParam === "null") {
     return NextResponse.json({
-      error: "User ID and Date parms as required in query",
-    }, { status: 400 });
+      error: "Nenhum agendamento encotnrado"
+    }, {
+      status: 400
+    })
   }
 
   try {
-    const [year, month, day] = dateParm.split("-").map(Number);
-    const startDate = new Date(year, month - 1, day, 0, 0, 0);
-    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+    // Converte a data recebida em um objeto Date
+    const [year, month, day] = dateParam.split("-").map(Number)
+    const startDate = new Date(year, month - 1, day, 0, 0, 0)
+    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999)
 
     const user = await prisma.user.findFirst({
       where: {
-        id: userId,
-      },
-    });
+        id: userId
+      }
+    })
 
     if (!user) {
       return NextResponse.json({
-        error: "User not found",
-      }, { status: 404 });
+        error: "Nenhum agendamento encotnrado"
+      }, {
+        status: 400
+      })
     }
 
     const appointments = await prisma.appointment.findMany({
       where: {
-        userId: user.id,
+        userId: userId,
         appointmentData: {
           gte: startDate,
-          lte: endDate,
-        },
+          lte: endDate
+        }
       },
       include: {
         service: true,
-      },
+      }
     })
 
-    //MONTAR UM ARRAY COM HORÁRIOS BLOQUEADOS
-    const blockedSlots = new Set<string>();
+    // Montar com todos os (slots) ocupados
+    const blockedSlots = new Set<string>()
 
     for (const apt of appointments) {
-      //Ex: Apt.time = "10:00", apt.service.duration = 60 (1hr)
-      const requiedSlots = Math.ceil(apt.service.duration / 30);
-      const startIndex = user.times.indexOf(apt.time);
+      // Ex: apt.time = "10:00", apt.service.duration = 60 (1h)
+      const requiredSlots = Math.ceil(apt.service.duration / 30)
+      const startIndex = user.times.indexOf(apt.time)
 
       if (startIndex !== -1) {
-        for (let i = 0; i < requiedSlots; i++) {
-          const blockedSlot = user.times[startIndex + i];
-
+        for (let i = 0; i < requiredSlots; i++) {
+          const blockedSlot = user.times[startIndex + i]
           if (blockedSlot) {
-            blockedSlots.add(blockedSlot);
+            blockedSlots.add(blockedSlot)
           }
         }
       }
+
     }
 
-    const blockedTimes = Array.from(blockedSlots);
-    console.log("Blocked Times:", blockedTimes);
-    return NextResponse.json(blockedTimes);
 
-  } catch (error) {
-    console.error("Error fetching appointments:", error);
+    const blockedtimes = Array.from(blockedSlots);
+
+    console.log("blockedtimes: ", blockedtimes)
+
+    return NextResponse.json(blockedtimes)
+
+
+  } catch (err) {
+    console.log(err);
     return NextResponse.json({
-      error: "Error fetching appointments",
-    }, { status: 500 });
+      error: "Nenhum agendamento encotnrado"
+    }, {
+      status: 400
+    })
   }
+
 }
