@@ -12,11 +12,9 @@ import { DateTimePicker } from "./data-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { set } from "date-fns"
 import { Label } from "@radix-ui/react-label"
 import { ScheduleTimeList } from "./schedule-time-list"
 import { createNewAppointment } from "../_actions/create-appointment"
-import { create } from "domain"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -87,7 +85,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
         if (!stillavaliable) {
           setSelectedTime("");
         }
-
+        
 
       })
     }
