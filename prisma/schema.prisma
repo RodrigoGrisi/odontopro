@@ -33,7 +33,7 @@ model Appointment{
 
 
 model Reminder{
-  id              String @unique @default(cuid())
+  id              String    @id @default(cuid())
   description     String
   //just for dates view
   createdAt         DateTime @default(now())
