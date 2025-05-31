@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import { Label } from "@radix-ui/react-label"
 import { ScheduleTimeList } from "./schedule-time-list"
 import { createNewAppointment } from "../_actions/create-appointment"
+import { set } from "date-fns"
 
 type UserWithSubscriptionAndServices = Prisma.UserGetPayload<{
   include: {
@@ -223,7 +224,10 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                       initialDate={new Date()}
                       minDate={new Date()} className="my-1"
                       onChange={(date) => {
-                        field.onChange(date);
+                        if(date){
+                          field.onChange(date);
+                          setSelectedTime("");  
+                        }
                       }
                       }
                     />
@@ -242,7 +246,10 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                   </FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value)=>{
+                        field.onChange(value);
+                        setSelectedTime("");
+                      }}
                       defaultValue={field.value}
                       value={field.value}
                     >

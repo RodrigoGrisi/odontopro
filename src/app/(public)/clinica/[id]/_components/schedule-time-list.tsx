@@ -29,22 +29,23 @@ export function ScheduleTimeList({
   return (
     <div className="grid grid-cols-5 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {avaliableTimeSlots.map((slot) => {
-        
+
         const sequenceOk = isSlotSequenceAvaliable(slot.time, requiredSlot, clinicTimes, blockedTimes);
-        
-        const slotEnable = slot.avaliable && sequenceOk;
 
         const slotIsPast = dateIsToday && isSlotInthePast(slot.time);
+
+        const slotEnable = slot.avaliable && sequenceOk && !slotIsPast;
+
         return (
           <Button
-            onClick={() => onSelectTime(slot.time)}
+            onClick={() => slotEnable && onSelectTime(slot.time)}
             type="button" key={slot.time} variant="outline"
             className={cn(
               "w-full h-12 text-sm font-medium",
               selectedTime === slot.time && "border-2 border-emerald-500 text-primary",
-              !slotEnable && "text-muted-foreground cursor-not-allowed text-white bg-red-950",
+              !slotEnable && "text-muted-foreground cursor-not-allowed  bg-red-950",
             )}
-            disabled={slotIsPast}
+            disabled={!slotEnable}
           >
             {slot.time}
           </Button>
