@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { ButtonCopyLink } from "./_components/button-copy-link";
-import { Reminders } from "./_components/reminders";
+import { Reminders } from "./_components/reminder/reminders";
 
 export default async function Dashboard() {
 
