@@ -2,9 +2,11 @@
 import { Reminder } from "@/generated/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash, Edit } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { deleteReminder } from "../../_actions/delete-reminder";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface ReminderListProps {
   reminder: Reminder[];
@@ -15,11 +17,15 @@ interface ReminderListProps {
  * @returns retorna uma lista de lembretes
  */
 export function ReminderList({ reminder }: ReminderListProps) {
-
+  const router = useRouter();
 
   async function handleDeleteReminder(reminderId: string) {
-
     const response = await deleteReminder({ reminderId: reminderId });
+
+    if (response?.error) {
+      toast.error("Erro ao deletar lembrete");
+      return;
+    }
 
   }
 
@@ -37,7 +43,7 @@ export function ReminderList({ reminder }: ReminderListProps) {
 
           {reminder.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              Voce ainda nao possui nenhum lembrete
+              Você ainda não possui nenhum lembrete.
             </p>
           )}
 
