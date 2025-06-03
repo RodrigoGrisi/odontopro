@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash, Edit } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { deleteReminder } from "../../_actions/delete-reminder";
 
 interface ReminderListProps {
   reminder: Reminder[];
@@ -14,6 +15,13 @@ interface ReminderListProps {
  * @returns retorna uma lista de lembretes
  */
 export function ReminderList({ reminder }: ReminderListProps) {
+
+
+  async function handleDeleteReminder(reminderId: string) {
+
+    const response = await deleteReminder({ reminderId: reminderId });
+
+  }
 
   return (
     <div className="flex flex-col gap-3 justify-center bg-gray-100">
@@ -42,9 +50,11 @@ export function ReminderList({ reminder }: ReminderListProps) {
                       <span className="font-bold">{reminder.description}</span>
                     </div>
                     <div className="flex flex-row gap-2 align-center justify-center">
-
-                      <Trash className="w-5 h-5 text-red-700" cursor={"pointer"} />
-                      <Edit className="w-5 h-5 text-blue-700" cursor={"pointer"} />
+                      <Button
+                        onClick={() => handleDeleteReminder(reminder.id)}
+                        variant="ghost" size="sm" className="w-9 p-0 m-0">
+                        <Trash className="w-5 h-5 text-red-700" cursor={"pointer"} />
+                      </Button>
                     </div>
                   </div>
                 </article>
