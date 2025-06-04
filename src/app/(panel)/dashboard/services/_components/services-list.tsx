@@ -36,12 +36,17 @@ export function ServicesList({ services }: ServicesListProps) {
     setEditingService(services);
     setIsDialogOpen(true);
 
-
   }
 
-
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={(open) => {
+      setIsDialogOpen(open);
+
+      if (!open) {
+        setEditingService(null);
+      }
+
+    }}>
       <section className="mx-auto  w-[100%]">
 
         <Card>
@@ -82,7 +87,8 @@ export function ServicesList({ services }: ServicesListProps) {
               <div>
                 <h2 className="text-lg font-semibold">{service.name}</h2>
                 <p className="text-gray-600">
-                  💰 Preço: {service.price} - ⏱ Duração: {service.duration} minutos
+                  💰 Preço: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(service.price / 100)} - ⏱ Duração: {service.duration} minutos
+
                 </p>
               </div>
 

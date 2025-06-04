@@ -20,7 +20,6 @@ export async function deleteReminder(formData: FormData) {
     }
   }
   
-  
   try {
     await prisma.reminder.delete({
       where: {
@@ -33,7 +32,6 @@ export async function deleteReminder(formData: FormData) {
 
 
   } catch (error) {
-
     return {
       error: "Erro ao deletar lembrete",
     }

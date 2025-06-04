@@ -1,74 +1,107 @@
 "use client"
-import { Reminder } from "@/generated/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Trash } from "lucide-react";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { deleteReminder } from "../../_actions/delete-reminder";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+
+import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card"
+import { Reminder } from "@/generated/prisma"
+import { Plus, Trash } from "lucide-react"
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { deleteReminder } from '../../_actions/delete-reminder'
+import { toast } from 'sonner'
+import { useRouter } from "next/navigation"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription
+} from '@/components/ui/dialog'
+import { ReminderContent } from './reminder-content'
+
 
 interface ReminderListProps {
-  reminder: Reminder[];
+  reminder: Reminder[]
 }
-/**
- * Este componente recebe uma lista de lembretes
- * @param  @ReminderListProps 
- * @returns retorna uma lista de lembretes
- */
+
 export function ReminderList({ reminder }: ReminderListProps) {
+
   const router = useRouter();
 
-  async function handleDeleteReminder(reminderId: string) {
-    const response = await deleteReminder({ reminderId: reminderId });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  async function handleDeleteReminder(id: string) {
+    const response = await deleteReminder({ reminderId: id })
 
     if (response?.error) {
-      toast.error("Erro ao deletar lembrete");
+      toast.error(response?.error)
       return;
     }
 
+    toast.success("Lembrete deletado com sucesso");
+    router.refresh();
   }
 
   return (
-    <div className="flex flex-col gap-3 justify-center bg-gray-100">
+    <div className="flex flex-col gap-3">
       <Card>
-        <CardHeader className="flex flex-row justify-between items-center space-y-0 pb-2">
-          <CardTitle className="text-1xl md:text-2xl font-bold">Lembretes</CardTitle>
-          <Button variant="ghost" size="sm" className="w-9 p-0 m-0 ">
-            <Plus className="w-5 h-5" />
-          </Button>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xl md:text-2xl font-bold">
+            Lembretes
+          </CardTitle>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" className="w-9 p-0">
+                <Plus className="w-5 h-5" />
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Novo Lembrete</DialogTitle>
+                <DialogDescription>Criar um novo lembrete para sua lista.</DialogDescription>
+              </DialogHeader>
+
+              <ReminderContent
+                closeDialog={() => setIsDialogOpen(false)}
+              />
+            </DialogContent>
+
+          </Dialog>
+
         </CardHeader>
 
         <CardContent>
-
           {reminder.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Você ainda não possui nenhum lembrete.
+            <p className="text-sm text-gray-500">
+              Nenhum lembrete registrado...
             </p>
           )}
 
-          <ScrollArea className="h-[400px]">
-            <div className="flex flex-col gap-2">
-              {reminder.map((reminder) => (
-                <article key={reminder.id} className="flex flex-row justify-between items-center">
-                  <div className="flex flex-row justify-between items-center border p-2 rounded w-full border-gray-400">
-                    <div className="flex flex-col">
-                      <span className="font-bold">{reminder.description}</span>
-                    </div>
-                    <div className="flex flex-row gap-2 align-center justify-center">
-                      <Button
-                        onClick={() => handleDeleteReminder(reminder.id)}
-                        variant="ghost" size="sm" className="w-9 p-0 m-0">
-                        <Trash className="w-5 h-5 text-red-700" cursor={"pointer"} />
-                      </Button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+          <ScrollArea
+            className="h-[340px] lg:max-h-[calc(100vh-15rem)] pr-0 w-full flex-1"
+          >
+            {reminder.map((item) => (
+              <article
+                key={item.id}
+                className="flex flex-wrap flex-row items-center justify-between py-2 bg-yellow-100 mb-2 px-2 rounded-md"
+              >
+                <p className="text-sm lg:text-base">{item.description}</p>
+
+                <Button
+                  className="bg-red-500 hover:bg-red-400 shadow-none rounded-full p-2"
+                  size="sm"
+                  onClick={() => handleDeleteReminder(item.id)}
+                >
+                  <Trash className="w-4 h-4 text-white" />
+                </Button>
+              </article>
+            ))}
           </ScrollArea>
+
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
