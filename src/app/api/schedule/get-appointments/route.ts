@@ -2,7 +2,6 @@
 
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { DateTime } from 'luxon'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -20,19 +19,9 @@ export async function GET(request: NextRequest) {
 
   try {
     // Converte a data recebida em um objeto Date
-    const [year, month, day] = dateParam.split('-').map(Number)
-
-    const startDate = DateTime.fromObject(
-      { year, month, day },
-      { zone: 'America/Sao_Paulo' }
-    ).minus({ days: 1 }).startOf('day').toJSDate()
-
-    const endDate = DateTime.fromObject(
-      { year, month, day },
-      { zone: 'America/Sao_Paulo' }
-    ).minus({ days: 1 }).endOf('day').toJSDate()
-
-    // Fim do dia anterior em Brasília
+    const [year, month, day] = dateParam.split("-").map(Number)
+    const startDate = new Date(year, month - 1, day, 0, 0, 0)
+    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999)
 
     const user = await prisma.user.findFirst({
       where: {
@@ -77,12 +66,14 @@ export async function GET(request: NextRequest) {
           }
         }
       }
+
     }
+
 
     const blockedtimes = Array.from(blockedSlots);
 
-    console.log("THIS is the date____________________ " + searchParams.get('date'));
     return NextResponse.json(blockedtimes)
+
 
   } catch (err) {
     console.log(err);

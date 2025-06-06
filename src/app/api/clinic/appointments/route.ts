@@ -43,7 +43,7 @@ export const GET = async (request: NextRequest) => {
       }
     });
 
-    return NextResponse.json({ appointments })
+    return NextResponse.json( appointments )
 
   } catch (error) {
     console.error("Erro ao buscar agendamentos:", error);

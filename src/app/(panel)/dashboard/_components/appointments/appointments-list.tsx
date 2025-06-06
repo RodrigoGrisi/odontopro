@@ -1,16 +1,22 @@
 "use client"
-import { useRouter, useSearchParams } from 'next/navigation'
+
+import { useSearchParams } from 'next/navigation'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Card,
-  CardTitle,
   CardContent,
   CardHeader,
-  CardDescription
+  CardTitle,
 } from '@/components/ui/card'
-import { ScrollArea } from '@radix-ui/react-scroll-area'
-import { Button } from '@/components/ui/button'
-import { Delete, Edit2, Eye } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { format } from 'date-fns'
+import { Prisma } from '@/generated/prisma'
 
+type AppointmentWithService = Prisma.AppointmentGetPayload<{
+  include: {
+    service: true,
+  }
+}>
 
 interface AppointmentsListProps {
   times: string[]
@@ -22,46 +28,118 @@ export function AppointmentsList({ times }: AppointmentsListProps) {
   const date = searchParams.get("date")
 
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["get-appointments", date],
+    queryFn: async () => {
+
+      let activeDate = date;
+
+      if (!activeDate) {
+        const today = format(new Date(), "yyyy-MM-dd")
+        activeDate = today;
+      }
+
+
+      const url = `${process.env.NEXT_PUBLIC_URL}/api/clinic/appointments?date=${activeDate}`
+
+      const response = await fetch(url)
+
+      const json = await response.json() as AppointmentWithService[];
+
+      console.log(json);
+
+      if (!response.ok) {
+        return []
+      }
+
+      return json;
+
+    }
+  })
+
+  // Monta occupantMap slot > appointment
+  // Se um Appointment começa no time (15:00) e tem requiredSlots 2
+  // occupantMap["15:00", appoitment] occupantMap["15:30", appoitment] 
+  const occupantMap: Record<string, AppointmentWithService> = {}
+
+
+  if (data && data.length > 0) {
+    for (const appointment of data) {
+      // Calcular quantos slots necessarios ocupa
+      const requiredSlots = Math.ceil(appointment.service.duration / 30);
+
+      // Descobrir qual é o indice do nosso array de horarios esse agendamento começa.
+      const startIndex = times.indexOf(appointment.time)
+
+      // Se encontrou o index
+      if (startIndex !== -1) {
+
+        for (let i = 0; i < requiredSlots; i++) {
+          const slotIndex = startIndex + i;
+
+          if (slotIndex < times.length) {
+            occupantMap[times[slotIndex]] = appointment;
+          }
+
+        }
+
+      }
+    }
+  }
+
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl md:text-2xl font-bold">
-          Listagem de horários
+      <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+        <CardTitle className='text-xl md:text-2xl font-bold'>
+          Agendamentos
         </CardTitle>
-        <Button>
-          Selecionar data
-        </Button>
+
+        <button>SELECIONAR DATA</button>
       </CardHeader>
+
       <CardContent>
-        <ScrollArea className="h-[calc(100vh-250px)] w-full overflow-y-auto">
-          <div className="flex flex-col gap-2">
-            {times.map((slot, index) => (
-              <article
-                key={index}
-                className="flex flex-row items-center justify-between py-2"
-              >
-                <div className="flex w-full border gap-3.5 justify-between border-gray-100 rounded-md p-2">
-                  <div className="flex gap-3">
-                  <p className="text-sm lg:text-base font-semibold">{slot}</p>
-                  <p className="text-sm lg:text-base text-gray-500">Disponível</p>
+        <ScrollArea className='h-[calc(100vh-20rem)] lg:h-[calc(100vh-15rem)] pr-4'>
+          {isLoading ? (
+            <p>Carregando agenda...</p>
+          ) : (
+            times.map((slot) => {
+              // ocupantMap["15:00"]
+              const occupant = occupantMap[slot]
+
+              if (occupant) {
+                return (
+                  <div
+                    key={slot}
+                    className='flex items-center py-2 border-t last:border-b'
+                  >
+                    <div className='w-16 text-sm font-semibold'>{slot}</div>
+                    <div className='flex-1 text-sm'>
+                      <div className='font-semibold'>{occupant.name}</div>
+                      <div className='text-sm text-gray-500'>
+                        {occupant.phone}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700">
-                      <Eye className="w-5 h-5" />
-                    </Button>
-                    <Button variant="ghost" className="p-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700">
-                      <Edit2 className="w-5 h-5" />
-                    </Button>
-                    <Button variant="ghost" className="p-2 bg-red-100 hover:bg-red-200 text-red-700">
-                      <Delete className="w-5 h-5" />
-                    </Button>
+                )
+              }
+
+              return (
+                <div
+                  key={slot}
+                  className='flex items-center py-2 border-t last:border-b'
+                >
+                  <div className='w-16 text-sm font-semibold'>{slot}</div>
+                  <div className='flex-1 text-sm'>
+                    Disponível
                   </div>
                 </div>
-              </article>
-            ))}
-          </div>
+              )
+            })
+          )}
         </ScrollArea>
       </CardContent>
+
     </Card>
   )
 }
