@@ -1,5 +1,3 @@
-// Backend meusite.com/api/schedule/get-appointments
-
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -20,8 +18,8 @@ export async function GET(request: NextRequest) {
   try {
     // Converte a data recebida em um objeto Date
     const [year, month, day] = dateParam.split("-").map(Number)
-    const startDate = new Date(year, month - 1, day, 0, 0, 0)
-    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999)
+    const startDate = new Date(`${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T00:00:00-03:00`)
+const endDate = new Date(`${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T23:59:59.999-03:00`)
 
     const user = await prisma.user.findFirst({
       where: {

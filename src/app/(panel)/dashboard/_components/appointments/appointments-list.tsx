@@ -54,7 +54,9 @@ export function AppointmentsList({ times }: AppointmentsListProps) {
 
       return json;
 
-    }
+    },    
+    staleTime: 20000,
+    refetchInterval: 60000,
   })
 
   // Monta occupantMap slot > appointment
