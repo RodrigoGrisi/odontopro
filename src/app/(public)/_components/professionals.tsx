@@ -3,6 +3,11 @@ import DoctorGrid from "../../../../public/imgs/26375249medico.jpg";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { User } from "@/generated/prisma";
+
+type ProfessionalsProps = {
+  professionals: User[];
+};
 
 const professionals = [
   { name: "Dra. Ana Paula", address: "Rua das Flores, 123 - São Paulo" },
@@ -15,7 +20,7 @@ const professionals = [
   { name: "Dr. Fernando Alves", address: "Av. Paulista, 999 - São Paulo" },
 ];
 
-export function Professionals() {
+export function Professionals({ professionals }: ProfessionalsProps) {
   return (
     <section className="bg-gray-200 mt-6 w-full justify-center ">
       <div className="container flex w-[100%] justify-centerpy-8 text-center">
@@ -25,23 +30,23 @@ export function Professionals() {
       </div>
       <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 px-4">
         {professionals.map((prof, index) => (
-          <Card key={index} className="flex flex-col justify-between overflow-hidden ">
+          <Card key={prof.id || index} className="flex flex-col justify-between overflow-hidden ">
             <CardContent >
               <div className="flex items-center justify-center">
                 <Image
                   src={DoctorGrid}
                   width={500}
-                  alt="foto ilustrativa profissional de saude"
+                  alt="foto ilustrativa profissional de saúde"
                   className="rounded-xl"
                   quality={100}
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-xl mt-4">{prof.name}</CardTitle>
+                  <CardTitle className="text-xl mt-4">{prof.name || "Profissional"}</CardTitle>
                   <div className="w-3.5 h-3.5 rounded-full bg-emerald-500"></div>
                 </div>
-                <p className="text-sm text-gray-700">{prof.address}</p>
+                <p className="text-sm text-gray-700">{prof.address || "Endereço não informado"}</p>
               </div>
             </CardContent>
             <CardFooter >
@@ -61,3 +66,4 @@ export function Professionals() {
     </section>
   );
 }
+

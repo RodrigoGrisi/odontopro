@@ -1,14 +1,23 @@
-import Header from "@/app/(public)/_components/header";
-import { Hero } from "@/app/(public)/_components/hero";
-import { Professionals } from "@/app/(public)/_components/professionals";
-import { Footer } from "@/app/(public)/_components/footer";
-export default function Home() {
+import { Footer } from "./_components/footer";
+import { Header } from "./_components/header";
+import { Hero } from './_components/hero'
+import { Professionals } from "./_components/professionals";
+import { getProfessionals } from "./_data-access/get-professionals";
+
+
+export default async function Home() {
+
+  const professionals = await getProfessionals();
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen">
       <Header />
+
       <div>
         <Hero />
-        <Professionals />
+
+        <Professionals professionals={professionals || []} />
+
         <Footer />
       </div>
     </div>

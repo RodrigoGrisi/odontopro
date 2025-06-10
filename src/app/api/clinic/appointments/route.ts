@@ -23,12 +23,11 @@ export const GET = async (request: NextRequest) => {
   }
 
   try {
-    //CRIAR UMA DATA FORMATADA
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day, 0, 0, 0, 0);
 
-    const startDate = new Date(year, month - 1, day, 0, 0, 0, 0);
-    const endDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+    const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    const endDate = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
     const appointments = await prisma.appointment.findMany({
       where: {
