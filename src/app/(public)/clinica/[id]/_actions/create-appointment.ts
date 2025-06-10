@@ -31,18 +31,14 @@ export async function createNewAppointment(
   }
 
   try {
-    // Ajustar data para meia-noite em horário de Brasília (UTC-3)
-    const selectedDate = formData.date;
-    
-    // ⚠️ ATENÇÃO: Isso assume que `formData.date` já veio como Date em BRT.
-    // Setar horário como meia-noite:
-    selectedDate.setHours(0, 0, 0, 0);
 
-    // Obter o deslocamento de fuso horário (em minutos) e converter para milissegundos
-    const timezoneOffset = selectedDate.getTimezoneOffset() * 60 * 1000;
+    const selectedDate = new Date(formData.date);
 
-    // Subtrair o offset para gerar a data em UTC equivalente à meia-noite no fuso local
-    const appointmentDate = new Date(selectedDate.getTime() - timezoneOffset);
+    const year = selectedDate.getFullYear();
+    const day = selectedDate.getDate();
+    const month = selectedDate.getMonth();
+
+    const appointmentDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
 
     const newAppointment = await prisma.appointment.create({
       data: {
